@@ -6,6 +6,6 @@ FingerPrint2のライブラリで、JavaScriptとHTMLの関係のあるところ
 
 機能を理解するために書いてみました。
 
-DOT.NET 3.1で開発しましたが、node.jsの開発で良かったと思います。
+HTMLとJavaScriptだけなら、ASP DotNetのプロジェクトで作ると楽ちんです。
 
 参考になればと思います。
