@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Page - DegitalFingerP</title>
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="site.css" />
+    <script src="jquery/dist/jquery.min.js"></script>
+    <script src="bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script async src="fingerprint2.js" onload="initFingerprintJS()"></script>
+</head>
+<body>
+    <header>
+    </header>
+
+    <div class="text-center">
+        <h1 class="display-4">FingerPrint2の収集情報</h1>
+        <p>Fingerprint2 Github: <a href="https://github.com/Valve/fingerprintjs2" target="_blank">https://github.com/Valve/fingerprintjs2</a></p>
+        <p>2020/12/19　日経朝刊１面　デバイスフィンガープリントの話題が載っていましたので作ってみました。</p>
+	 <p>収集した情報からハッシュ値を求めて、同じ端末と認識する仕組みです。</p>
+	 <p>Retar.jpは情報収集していませんが、どんな情報が収集されるのかをわかるようにしました。</p>
+        <div id="control">
+            <p><button onclick="start()">開始</button></p>
+            <p>
+                <span>userAgent:</span><input type="checkbox" id="userAgent" checked="checked">
+                <span>fonts:</span><input type="checkbox" id="fonts" checked="checked">
+                <span>fontsFlash:</span><input type="checkbox" id="fontsFlash" checked="checked">
+                <span>canvas:</span><input type="checkbox" id="canvas" checked="checked">
+                <span>webgl:</span><input type="checkbox" id="webgl" checked="checked">
+                <span>audio:</span><input type="checkbox" id="audio" checked="checked">
+                <span>enumerateDevices:</span><input type="checkbox" id="enumerateDevices" checked="checked">
+            </p>
+        </div>
+    </div>
+    <div id="view">
+
+    </div>
+    <script>
+        function start() {
+            const start = new Date().getTime();
+            let view = document.querySelector('#view');
+            view.innerHTML = '';
+            let excludes = {};
+            if (!document.querySelector('#userAgent').checked) {
+                excludes.userAgent = true;
+            }
+            if (!document.querySelector('#audio').checked) {
+                excludes.audio = true;
+            }
+            if (!document.querySelector('#enumerateDevices').checked) {
+                excludes.enumerateDevices = true;
+            }
+            if (!document.querySelector('#fonts').checked) {
+                excludes.fonts = true;
+            }
+            if (!document.querySelector('#fontsFlash').checked) {
+                excludes.fontsFlash = true;
+            }
+            if (!document.querySelector('#webgl').checked) {
+                excludes.webgl = true;
+            }
+            if (!document.querySelector('#canvas').checked) {
+                excludes.canvas = true;
+            }
+            let options = { excludes: excludes }
+
+            Fingerprint2.get(options, function (components) {
+                // 参数
+                const values = components.map(function (component) {
+                    return component.value
+                });
+                // 指?
+                const murmur = Fingerprint2.x64hash128(values.join(''), 31);
+                view.innerHTML += '<hr></hr><p>FingerPrint HASH : <b><font size="2" color="red">' + murmur + '</font></b></p>';
+                view.innerHTML += '<hr></hr><p>時間 : <b>' + (new Date().getTime() - start) + ' ミリ秒</b></p><hr></hr>';
+                for (const c of components) {
+                    view.innerHTML += '<p>' + c.key + ' : <b>' + c.value + '</b></p>';
+                }
+            });
+        }
+    </script>
+
+    <footer class="border-top footer text-muted">
+    </footer>
+    <script>
+        function initFingerprintJS() {
+            //userAgentに関わる部分は取得せず端末固有のハッシュ値のみで取得
+            var options = { excludes: { userAgent: true } };
+            Fingerprint2.get(options, function (result) {
+                //取得したもの
+                var jsonString = JSON.stringify(result)
+                console.log(jsonString);
+                ////ハッシュ値・MurmurHash（https://tanjent.livejournal.com/756623.html）
+                //var values = result.map(function (component) { return component.value });
+                //this.hashval = Fingerprint2.x64hash128(values.join(''), 31);
+                //console.log(hashval);
+            });
+            //return hashval;
+        }
+    </script>
+
+</body>
+</html>
